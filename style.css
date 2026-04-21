@@ -218,7 +218,6 @@ a:hover {
 }
 .img-wrapper {
   position: relative;
-  overflow: hidden;
 }
 .book-cover-img {
   width: 100%;
@@ -227,43 +226,46 @@ a:hover {
   display: block;
   margin: 0 auto;
   cursor: crosshair;
-  transition: opacity 0.2s ease;
-}
-.book-cover-img:hover {
-  opacity: 0.92;
 }
 
-/* Zoom lens that follows mouse */
+/* Zoom container */
 .zoom-container {
   position: relative;
   display: inline-block;
   width: 100%;
+  text-align: center;
 }
+
+/* Circular magnifier lens on top of image */
 .zoom-lens {
   position: absolute;
-  border: 2px solid #febd69;
+  border: 3px solid #febd69;
   border-radius: 50%;
-  width: 80px;
-  height: 80px;
+  width: 90px;
+  height: 90px;
   cursor: crosshair;
   display: none;
   pointer-events: none;
-  box-shadow: 0 0 0 2px #131921;
-  z-index: 10;
+  box-shadow: 0 0 0 2px #131921, inset 0 0 8px rgba(254,189,105,0.3);
+  z-index: 20;
+  background: rgba(254,189,105,0.08);
 }
+
+/* Zoomed result panel - appears to the RIGHT of the image */
 .zoom-result {
-  position: absolute;
-  top: 0;
-  left: 105%;
-  width: 280px;
-  height: 320px;
-  border: 2px solid #ddd;
-  border-radius: 4px;
+  position: fixed;
+  top: 120px;
+  left: 270px;
+  width: 300px;
+  height: 360px;
+  border: 2px solid #febd69;
+  border-radius: 8px;
   display: none;
   background-repeat: no-repeat;
   background-color: #fff;
-  box-shadow: 4px 4px 16px rgba(0,0,0,0.2);
-  z-index: 100;
+  box-shadow: 6px 6px 20px rgba(0,0,0,0.25);
+  z-index: 9999;
+  overflow: hidden;
 }
 .read-sample-btn {
   display: block;
