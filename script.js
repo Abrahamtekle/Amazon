@@ -164,75 +164,56 @@ function showToast(message) {
 
 // ===== IMAGE HOVER ZOOM (magnifier lens) =====
 function setupZoom() {
-  var img        = document.getElementById('book-cover-img');
-  var lens       = document.getElementById('zoom-lens');
-  var result     = document.getElementById('zoom-result');
-  var container  = document.getElementById('zoom-container');
+  var img       = document.getElementById('book-cover-img');
+  var lens      = document.getElementById('zoom-lens');
+  var result    = document.getElementById('zoom-result');
 
   if (!img || !lens || !result) return;
 
-  var zoomLevel = 3; // how much to magnify
-
-  // Set result background to the same image
-  img.addEventListener('load', setBackground);
-  if (img.complete) setBackground();
+  var zoomLevel = 3;
 
   function setBackground() {
+    var w = img.offsetWidth;
+    var h = img.offsetHeight;
     result.style.backgroundImage = "url('" + img.src + "')";
-    result.style.backgroundSize  =
-      (img.width * zoomLevel) + 'px ' + (img.height * zoomLevel) + 'px';
+    result.style.backgroundSize  = (w * zoomLevel) + 'px ' + (h * zoomLevel) + 'px';
+    result.style.width  = '300px';
+    result.style.height = (h) + 'px';
   }
 
-  // Show lens + result on mouse enter
   img.addEventListener('mouseenter', function() {
     lens.style.display   = 'block';
     result.style.display = 'block';
     setBackground();
   });
 
-  // Hide on mouse leave
   img.addEventListener('mouseleave', function() {
     lens.style.display   = 'none';
     result.style.display = 'none';
   });
 
-  // Move lens with mouse
   img.addEventListener('mousemove', moveLens);
-  lens.addEventListener('mousemove', moveLens);
-  lens.addEventListener('mouseleave', function() {
-    lens.style.display   = 'none';
-    result.style.display = 'none';
-  });
 
   function moveLens(e) {
-    e.preventDefault();
-    var pos    = getCursorPos(e);
-    var lensW  = lens.offsetWidth  / 2;
-    var lensH  = lens.offsetHeight / 2;
+    var rect  = img.getBoundingClientRect();
+    var x     = e.clientX - rect.left;
+    var y     = e.clientY - rect.top;
+    var lensW = lens.offsetWidth  / 2;
+    var lensH = lens.offsetHeight / 2;
 
-    var x = pos.x - lensW;
-    var y = pos.y - lensH;
+    var lx = x - lensW;
+    var ly = y - lensH;
 
-    // Keep lens inside image bounds
-    if (x < 0) x = 0;
-    if (y < 0) y = 0;
-    if (x > img.width  - lens.offsetWidth)  x = img.width  - lens.offsetWidth;
-    if (y > img.height - lens.offsetHeight) y = img.height - lens.offsetHeight;
+    if (lx < 0) lx = 0;
+    if (ly < 0) ly = 0;
+    if (lx > img.offsetWidth  - lens.offsetWidth)  lx = img.offsetWidth  - lens.offsetWidth;
+    if (ly > img.offsetHeight - lens.offsetHeight) ly = img.offsetHeight - lens.offsetHeight;
 
-    lens.style.left = x + 'px';
-    lens.style.top  = y + 'px';
+    lens.style.left = lx + 'px';
+    lens.style.top  = ly + 'px';
 
-    // Move background in result window
     result.style.backgroundPosition =
-      '-' + (x * zoomLevel) + 'px -' + (y * zoomLevel) + 'px';
-  }
-
-  function getCursorPos(e) {
-    var rect = img.getBoundingClientRect();
-    return {
-      x: e.clientX - rect.left,
-      y: e.clientY - rect.top
-    };
+      '-' + (lx * zoomLevel) + 'px -' + (ly * zoomLevel) + 'px';
   }
 }
 
