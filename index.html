@@ -242,22 +242,6 @@
     </div>
 
     <button class="add-cart-btn" onclick="addToCart()">Add to Cart</button>
-
-    <!-- CART POPUP DIALOG -->
-    <div id="cart-overlay" class="cart-overlay" onclick="closeCartDialog()"></div>
-    <div id="cart-dialog" class="cart-dialog">
-      <div class="cart-dialog-header">
-        <span class="cart-dialog-title">&#10003; Added to Cart</span>
-        <button class="cart-dialog-close" onclick="closeCartDialog()">&#10005;</button>
-      </div>
-      <div class="cart-dialog-body">
-        <div class="cart-item-row">
-          <img id="cart-thumb" class="cart-thumb" src="" alt="book">
-          <div class="cart-item-info">
-            <div class="cart-item-name">Wings of Fire: The Brightest Night</div>
-            <div class="cart-item-format" id="cart-format-label">Paperback</div>
-            <div class="cart-item-qty" id="cart-qty-label">Qty: 1</div>
-          </div>
         </div>
         <hr class="cart-divider">
         <div class="cart-cost-table">
@@ -333,5 +317,57 @@
 <div class="toast" id="toast"></div>
 
 <script src="script.js"></script>
+
+<!-- CART POPUP DIALOG -->
+<div id="cart-overlay" class="cart-overlay" onclick="closeCartDialog()"></div>
+<div id="cart-dialog" class="cart-dialog">
+  <div class="cart-dialog-header">
+    <span class="cart-dialog-title">&#10003; Added to Cart</span>
+    <button class="cart-dialog-close" onclick="closeCartDialog()">&#10005;</button>
+  </div>
+  <div class="cart-dialog-body">
+    <div class="cart-item-row">
+      <img id="cart-thumb" class="cart-thumb" src="" alt="book">
+      <div class="cart-item-info">
+        <div class="cart-item-name">Wings of Fire: The Brightest Night</div>
+        <div class="cart-item-format" id="cart-format-label">Paperback</div>
+        <div class="cart-item-qty" id="cart-qty-label">Qty: 1</div>
+      </div>
+    </div>
+    <hr class="cart-divider">
+    <div class="cart-cost-table">
+      <div class="cart-cost-row">
+        <span class="cart-cost-label">Price per item:</span>
+        <span class="cart-cost-val" id="dialog-price">$16.95</span>
+      </div>
+      <div class="cart-cost-row">
+        <span class="cart-cost-label">Quantity:</span>
+        <span class="cart-cost-val" id="dialog-qty">1</span>
+      </div>
+      <div class="cart-cost-row">
+        <span class="cart-cost-label">Subtotal:</span>
+        <span class="cart-cost-val" id="dialog-subtotal">$16.95</span>
+      </div>
+      <hr class="cart-divider">
+      <div class="cart-cost-row">
+        <span class="cart-cost-label">GST (5%):</span>
+        <span class="cart-cost-val" id="dialog-gst">$0.85</span>
+      </div>
+      <div class="cart-cost-row">
+        <span class="cart-cost-label">HST / PST:</span>
+        <span class="cart-cost-val" id="dialog-hst">$0.00</span>
+      </div>
+      <hr class="cart-divider">
+      <div class="cart-cost-row cart-total-row">
+        <span class="cart-cost-label">Total (incl. tax):</span>
+        <span class="cart-cost-val cart-total-val" id="dialog-total">$17.80</span>
+      </div>
+    </div>
+    <div class="cart-dialog-btns">
+      <button class="cart-proceed-btn" onclick="closeCartDialog()">Proceed to Checkout</button>
+      <button class="cart-continue-btn" onclick="closeCartDialog()">Continue Shopping</button>
+    </div>
+  </div>
+</div>
 </body>
 </html>
