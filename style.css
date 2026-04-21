@@ -864,6 +864,7 @@ a:hover {
   border-radius: 4px !important;
   border: 1px solid #ddd !important;
   flex-shrink: 0 !important;
+  background: linear-gradient(160deg, #c8360c, #8b1a00) !important;
 }
 .cart-item-info { flex: 1 !important; }
 .cart-item-name {
