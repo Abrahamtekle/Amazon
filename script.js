@@ -170,7 +170,7 @@ function setupZoom() {
 
   if (!img || !lens || !result) return;
 
-  var ZOOM = 4;
+  var ZOOM = 5;
 
   // Wait until image is fully loaded before setting up
   function init() {
@@ -178,8 +178,6 @@ function setupZoom() {
     var ih = img.offsetHeight;
 
     // Style the result box
-    result.style.width            = '450px';
-    result.style.height           = '500px';
     result.style.backgroundImage  = "url('" + img.src + "')";
     result.style.backgroundSize   = (iw * ZOOM) + 'px ' + (ih * ZOOM) + 'px';
     result.style.backgroundRepeat = 'no-repeat';
