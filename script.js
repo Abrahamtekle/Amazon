@@ -162,7 +162,7 @@ function showToast(message) {
   setTimeout(function() { toast.classList.remove('show'); }, 3000);
 }
 
-// ===== IMAGE HOVER ZOOM =====
+// ===== IMAGE HOVER ZOOM (side by side like Amazon) =====
 function setupZoom() {
   var img    = document.getElementById('book-cover-img');
   var lens   = document.getElementById('zoom-lens');
@@ -170,14 +170,11 @@ function setupZoom() {
 
   if (!img || !lens || !result) return;
 
-  var ZOOM = 5;
+  var ZOOM = 4;
 
-  // Wait until image is fully loaded before setting up
   function init() {
     var iw = img.offsetWidth;
     var ih = img.offsetHeight;
-
-    // Style the result box
     result.style.backgroundImage  = "url('" + img.src + "')";
     result.style.backgroundSize   = (iw * ZOOM) + 'px ' + (ih * ZOOM) + 'px';
     result.style.backgroundRepeat = 'no-repeat';
@@ -195,7 +192,7 @@ function setupZoom() {
   });
 
   img.addEventListener('mousemove', function(e) {
-    var rect = img.getBoundingClientRect();
+    var rect   = img.getBoundingClientRect();
     var mouseX = e.clientX - rect.left;
     var mouseY = e.clientY - rect.top;
 
@@ -204,7 +201,7 @@ function setupZoom() {
     var lw = lens.offsetWidth;
     var lh = lens.offsetHeight;
 
-    // Position lens centered on cursor, clamped to image bounds
+    // Center lens on cursor, clamped inside image
     var lx = mouseX - lw / 2;
     var ly = mouseY - lh / 2;
     if (lx < 0) lx = 0;
@@ -215,10 +212,9 @@ function setupZoom() {
     lens.style.left = lx + 'px';
     lens.style.top  = ly + 'px';
 
-    // Shift background in result to match lens position
-    var bgX = -(lx * ZOOM);
-    var bgY = -(ly * ZOOM);
-    result.style.backgroundPosition = bgX + 'px ' + bgY + 'px';
+    // Shift background so lens area shows in result panel
+    result.style.backgroundPosition =
+      (-lx * ZOOM) + 'px ' + (-ly * ZOOM) + 'px';
   });
 }
 
