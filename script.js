@@ -162,25 +162,78 @@ function showToast(message) {
   setTimeout(function() { toast.classList.remove('show'); }, 3000);
 }
 
-// ===== IMAGE ZOOM =====
+// ===== IMAGE HOVER ZOOM (magnifier lens) =====
 function setupZoom() {
-  var coverImg = document.querySelector('.book-cover-img');
-  if (!coverImg) return;
+  var img        = document.getElementById('book-cover-img');
+  var lens       = document.getElementById('zoom-lens');
+  var result     = document.getElementById('zoom-result');
+  var container  = document.getElementById('zoom-container');
 
-  var overlay = document.createElement('div');
-  overlay.className = 'zoom-overlay';
-  var zoomImg = document.createElement('img');
-  zoomImg.src = coverImg.src;
-  zoomImg.alt = 'Zoomed cover';
-  overlay.appendChild(zoomImg);
-  document.body.appendChild(overlay);
+  if (!img || !lens || !result) return;
 
-  coverImg.addEventListener('click', function() {
-    overlay.classList.add('active');
+  var zoomLevel = 3; // how much to magnify
+
+  // Set result background to the same image
+  img.addEventListener('load', setBackground);
+  if (img.complete) setBackground();
+
+  function setBackground() {
+    result.style.backgroundImage = "url('" + img.src + "')";
+    result.style.backgroundSize  =
+      (img.width * zoomLevel) + 'px ' + (img.height * zoomLevel) + 'px';
+  }
+
+  // Show lens + result on mouse enter
+  img.addEventListener('mouseenter', function() {
+    lens.style.display   = 'block';
+    result.style.display = 'block';
+    setBackground();
   });
-  overlay.addEventListener('click', function() {
-    overlay.classList.remove('active');
+
+  // Hide on mouse leave
+  img.addEventListener('mouseleave', function() {
+    lens.style.display   = 'none';
+    result.style.display = 'none';
   });
+
+  // Move lens with mouse
+  img.addEventListener('mousemove', moveLens);
+  lens.addEventListener('mousemove', moveLens);
+  lens.addEventListener('mouseleave', function() {
+    lens.style.display   = 'none';
+    result.style.display = 'none';
+  });
+
+  function moveLens(e) {
+    e.preventDefault();
+    var pos    = getCursorPos(e);
+    var lensW  = lens.offsetWidth  / 2;
+    var lensH  = lens.offsetHeight / 2;
+
+    var x = pos.x - lensW;
+    var y = pos.y - lensH;
+
+    // Keep lens inside image bounds
+    if (x < 0) x = 0;
+    if (y < 0) y = 0;
+    if (x > img.width  - lens.offsetWidth)  x = img.width  - lens.offsetWidth;
+    if (y > img.height - lens.offsetHeight) y = img.height - lens.offsetHeight;
+
+    lens.style.left = x + 'px';
+    lens.style.top  = y + 'px';
+
+    // Move background in result window
+    result.style.backgroundPosition =
+      '-' + (x * zoomLevel) + 'px -' + (y * zoomLevel) + 'px';
+  }
+
+  function getCursorPos(e) {
+    var rect = img.getBoundingClientRect();
+    return {
+      x: e.clientX - rect.left,
+      y: e.clientY - rect.top
+    };
+  }
 }
 
 // ===== DOM READY =====
