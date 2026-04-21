@@ -640,3 +640,98 @@ a:hover {
   color: #007185;
   padding: 4px 0;
 }
+
+/* ===== TOTAL COST BOX ===== */
+.total-box {
+  background: #fff8e7;
+  border: 1px solid #f0c14b;
+  border-radius: 6px;
+  padding: 8px 12px;
+  margin-bottom: 10px;
+}
+.total-label {
+  font-size: 11px;
+  color: #555;
+  margin-bottom: 2px;
+}
+.total-amount {
+  font-size: 24px;
+  font-weight: bold;
+  color: #B12704;
+}
+.unit-note {
+  font-size: 11px;
+  color: #777;
+  margin-top: 2px;
+  min-height: 14px;
+}
+
+/* ===== POSTAL CODE / DELIVERY BOX ===== */
+.postal-box {
+  margin-top: 12px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 10px;
+  background: #f9f9f9;
+}
+.postal-title {
+  font-size: 12px;
+  font-weight: bold;
+  color: #0F1111;
+  margin-bottom: 8px;
+}
+.postal-row {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 8px;
+}
+.postal-input {
+  flex: 1;
+  padding: 5px 8px;
+  border: 1px solid #aaa;
+  border-radius: 4px;
+  font-size: 12px;
+  outline: none;
+  text-transform: uppercase;
+}
+.postal-input:focus {
+  border-color: #007185;
+  box-shadow: 0 0 0 2px rgba(0,113,133,0.15);
+}
+.postal-btn {
+  background: linear-gradient(to bottom, #f7dfa5, #f0c14b);
+  border: 1px solid #a88734;
+  border-radius: 4px;
+  padding: 5px 10px;
+  font-size: 12px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: filter 0.15s;
+}
+.postal-btn:hover { filter: brightness(0.95); }
+.delivery-line {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: #007600;
+  font-size: 12px;
+  margin-bottom: 3px;
+}
+.delivery-icon { font-size: 14px; }
+.delivery-days-note {
+  font-size: 11px;
+  color: #555;
+  margin-left: 4px;
+  margin-bottom: 3px;
+}
+.delivery-free {
+  font-size: 11px;
+  color: #007185;
+  margin-top: 2px;
+}
+.kindle-delivery {
+  font-size: 12px;
+  color: #007185;
+  padding: 4px 0;
+  font-weight: bold;
+}
