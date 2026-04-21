@@ -216,17 +216,54 @@ a:hover {
   text-align: center;
   background: #fff;
 }
+.img-wrapper {
+  position: relative;
+  overflow: hidden;
+}
 .book-cover-img {
   width: 100%;
   max-width: 210px;
   height: auto;
   display: block;
   margin: 0 auto;
-  cursor: zoom-in;
-  transition: transform 0.2s ease;
+  cursor: crosshair;
+  transition: opacity 0.2s ease;
 }
 .book-cover-img:hover {
-  transform: scale(1.03);
+  opacity: 0.92;
+}
+
+/* Zoom lens that follows mouse */
+.zoom-container {
+  position: relative;
+  display: inline-block;
+  width: 100%;
+}
+.zoom-lens {
+  position: absolute;
+  border: 2px solid #febd69;
+  border-radius: 50%;
+  width: 80px;
+  height: 80px;
+  cursor: crosshair;
+  display: none;
+  pointer-events: none;
+  box-shadow: 0 0 0 2px #131921;
+  z-index: 10;
+}
+.zoom-result {
+  position: absolute;
+  top: 0;
+  left: 105%;
+  width: 280px;
+  height: 320px;
+  border: 2px solid #ddd;
+  border-radius: 4px;
+  display: none;
+  background-repeat: no-repeat;
+  background-color: #fff;
+  box-shadow: 4px 4px 16px rgba(0,0,0,0.2);
+  z-index: 100;
 }
 .read-sample-btn {
   display: block;
