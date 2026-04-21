@@ -210,63 +210,18 @@ a:hover {
   width: 240px;
   flex-shrink: 0;
 }
-.img-wrapper {
-  border: 1px solid #ddd;
-  padding: 10px;
-  text-align: center;
-  background: #fff;
-}
-.img-wrapper {
-  position: relative;
-}
-.book-cover-img {
-  width: 100%;
-  max-width: 210px;
-  height: auto;
-  display: block;
-  margin: 0 auto;
-  cursor: crosshair;
-}
+
+
+
 
 /* Zoom container */
-.zoom-container {
-  position: relative;
-  display: inline-block;
-  width: 100%;
-  text-align: center;
-}
+
 
 /* Circular magnifier lens on top of image */
-.zoom-lens {
-  position: absolute;
-  border: 3px solid #febd69;
-  border-radius: 50%;
-  width: 90px;
-  height: 90px;
-  cursor: crosshair;
-  display: none;
-  pointer-events: none;
-  box-shadow: 0 0 0 2px #131921, inset 0 0 8px rgba(254,189,105,0.3);
-  z-index: 20;
-  background: rgba(254,189,105,0.08);
-}
+
 
 /* Zoomed result panel - appears to the RIGHT of the image */
-.zoom-result {
-  position: fixed;
-  top: 120px;
-  left: 270px;
-  width: 300px;
-  height: 360px;
-  border: 2px solid #febd69;
-  border-radius: 8px;
-  display: none;
-  background-repeat: no-repeat;
-  background-color: #fff;
-  box-shadow: 6px 6px 20px rgba(0,0,0,0.25);
-  z-index: 9999;
-  overflow: hidden;
-}
+
 .read-sample-btn {
   display: block;
   width: 100%;
@@ -776,46 +731,61 @@ a:hover {
 }
 
 /* ===== ZOOM ===== */
+
+
+
+
+
+
+
+/* ===== IMAGE + ZOOM SIDE BY SIDE ===== */
+.img-wrapper {
+  position: relative;
+  padding: 10px;
+  border: 1px solid #ddd;
+  background: #fff;
+  text-align: center;
+}
+
 .zoom-container {
   position: relative;
   display: inline-block;
-  width: 100%;
-  text-align: center;
+  width: 210px;
 }
+
 .book-cover-img {
-  width: 100%;
-  max-width: 210px;
+  width: 210px;
   height: auto;
   display: block;
-  margin: 0 auto;
   cursor: crosshair;
 }
+
+/* Small circle lens on top of original image */
 .zoom-lens {
   position: absolute;
-  width: 80px;
-  height: 80px;
-  border: 3px solid #febd69;
-  border-radius: 50%;
+  width: 100px;
+  height: 100px;
+  border: 2px solid #999;
+  background: rgba(255,255,255,0.15);
   pointer-events: none;
   display: none;
   z-index: 20;
-  box-shadow: 0 0 0 2px #333;
-  left: 0;
-  top: 0;
+  cursor: crosshair;
+  box-shadow: 0 0 0 1px #666;
 }
+
+/* Big zoomed panel — appears RIGHT NEXT to the image */
 .zoom-result {
-  position: fixed;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
+  position: absolute;
+  top: 0;
+  left: 225px;
   width: 700px;
-  height: 700px;
-  border: 4px solid #febd69;
-  border-radius: 12px;
+  height: 500px;
+  border: 1px solid #ddd;
   display: none;
-  background-color: #fff;
   background-repeat: no-repeat;
-  box-shadow: 0 20px 60px rgba(0,0,0,0.6);
+  background-color: #fff;
+  box-shadow: 4px 4px 16px rgba(0,0,0,0.15);
   z-index: 9999;
   overflow: hidden;
 }
