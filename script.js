@@ -146,12 +146,74 @@ function updateDelivery() {
 function addToCart() {
   var qty   = parseInt(document.getElementById('qty-select').value) || 1;
   var p     = prices[currentFormat];
-  var total = (p.full * qty).toFixed(2);
+  var subtotal = p.full * qty;
 
+  // Canada tax rates
+  var GST_RATE = 0.05;   // 5% federal GST
+  var HST_RATE = 0.00;   // 0% HST (Alberta has no PST/HST)
+  // Note: Ontario = 0.08 PST portion, BC = 0.07 PST, Quebec = 0.09975 QST
+  // Detect province from postal code if available
+  var postalInput = document.getElementById('postal-input');
+  var postal = postalInput ? postalInput.value.trim().toUpperCase() : 'T';
+  var firstLetter = postal.charAt(0);
+
+  // Provincial tax rates (HST or PST portion on top of GST)
+  var provinceTax = {
+    'M': 0.08,  // Ontario PST
+    'L': 0.08,
+    'K': 0.08,
+    'N': 0.08,
+    'P': 0.08,
+    'H': 0.09975, // Quebec QST
+    'G': 0.09975,
+    'J': 0.09975,
+    'V': 0.07,  // BC PST
+    'E': 0.10,  // New Brunswick HST
+    'B': 0.10,  // Nova Scotia HST
+    'C': 0.10,  // PEI HST
+    'A': 0.10,  // Newfoundland HST
+    'T': 0.00,  // Alberta - no PST
+    'S': 0.06,  // Saskatchewan PST
+    'R': 0.07   // Manitoba PST
+  };
+
+  var hstRate = provinceTax[firstLetter] !== undefined ? provinceTax[firstLetter] : 0.00;
+  var gst     = subtotal * GST_RATE;
+  var hst     = subtotal * hstRate;
+  var total   = subtotal + gst + hst;
+
+  // Format names for display
+  var formatNames = { kindle: 'Kindle Edition', paperback: 'Paperback', hardcover: 'Hardcover' };
+
+  // Update cart count in header
   var cartCount = document.querySelector('.cart-count');
   cartCount.textContent = (parseInt(cartCount.textContent) || 0) + qty;
 
-  showToast('&#10003; Added ' + qty + ' x ' + p.label + ' = $' + total + ' to Cart!');
+  // Fill dialog values
+  var img = document.getElementById('book-cover-img');
+  var thumb = document.getElementById('cart-thumb');
+  if (thumb && img) thumb.src = img.src;
+
+  document.getElementById('cart-format-label').textContent = formatNames[currentFormat];
+  document.getElementById('cart-qty-label').textContent    = 'Qty: ' + qty;
+  document.getElementById('dialog-price').textContent      = p.label;
+  document.getElementById('dialog-qty').textContent        = qty;
+  document.getElementById('dialog-subtotal').textContent   = '$' + subtotal.toFixed(2);
+  document.getElementById('dialog-gst').textContent        = '$' + gst.toFixed(2) + ' (5%)';
+  document.getElementById('dialog-hst').textContent        = hstRate > 0
+    ? '$' + hst.toFixed(2) + ' (' + (hstRate * 100).toFixed(2) + '%)'
+    : '$0.00 (Alberta - no PST)';
+  document.getElementById('dialog-total').textContent      = '$' + total.toFixed(2);
+
+  // Show dialog
+  document.getElementById('cart-overlay').classList.add('active');
+  document.getElementById('cart-dialog').classList.add('active');
+}
+
+// ===== CLOSE CART DIALOG =====
+function closeCartDialog() {
+  document.getElementById('cart-overlay').classList.remove('active');
+  document.getElementById('cart-dialog').classList.remove('active');
 }
 
 // ===== TOAST NOTIFICATION =====
