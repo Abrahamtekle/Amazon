@@ -148,39 +148,39 @@ function addToCart() {
   var p     = prices[currentFormat];
   var subtotal = p.full * qty;
 
-  // Canada tax rates
-  var GST_RATE = 0.05;   // 5% federal GST
-  var HST_RATE = 0.00;   // 0% HST (Alberta has no PST/HST)
-  // Note: Ontario = 0.08 PST portion, BC = 0.07 PST, Quebec = 0.09975 QST
-  // Detect province from postal code if available
-  var postalInput = document.getElementById('postal-input');
-  var postal = postalInput ? postalInput.value.trim().toUpperCase() : 'T';
-  var firstLetter = postal.charAt(0);
+  // Detect province from postal code
+  var postalInput  = document.getElementById('postal-input');
+  var postal       = postalInput ? postalInput.value.trim().toUpperCase() : 'T';
+  var firstLetter  = postal.charAt(0);
 
-  // Provincial tax rates (HST or PST portion on top of GST)
-  var provinceTax = {
-    'M': 0.08,  // Ontario PST
-    'L': 0.08,
-    'K': 0.08,
-    'N': 0.08,
-    'P': 0.08,
-    'H': 0.09975, // Quebec QST
-    'G': 0.09975,
-    'J': 0.09975,
-    'V': 0.07,  // BC PST
-    'E': 0.10,  // New Brunswick HST
-    'B': 0.10,  // Nova Scotia HST
-    'C': 0.10,  // PEI HST
-    'A': 0.10,  // Newfoundland HST
-    'T': 0.00,  // Alberta - no PST
-    'S': 0.06,  // Saskatchewan PST
-    'R': 0.07   // Manitoba PST
+  // Province info: { name, gst, hst, pst, hstLabel }
+  // HST provinces collect HST instead of GST+PST separately
+  var provinceData = {
+    'T': { name: 'Alberta',            gst: 0.05, hst: 0.00,  pst: 0.00,    hstLabel: 'PST'  },
+    'S': { name: 'Saskatchewan',       gst: 0.05, hst: 0.00,  pst: 0.06,    hstLabel: 'PST'  },
+    'R': { name: 'Manitoba',           gst: 0.05, hst: 0.00,  pst: 0.07,    hstLabel: 'PST'  },
+    'V': { name: 'British Columbia',   gst: 0.05, hst: 0.00,  pst: 0.07,    hstLabel: 'PST'  },
+    'M': { name: 'Ontario',            gst: 0.00, hst: 0.13,  pst: 0.00,    hstLabel: 'HST'  },
+    'L': { name: 'Ontario',            gst: 0.00, hst: 0.13,  pst: 0.00,    hstLabel: 'HST'  },
+    'K': { name: 'Ontario',            gst: 0.00, hst: 0.13,  pst: 0.00,    hstLabel: 'HST'  },
+    'N': { name: 'Ontario',            gst: 0.00, hst: 0.13,  pst: 0.00,    hstLabel: 'HST'  },
+    'P': { name: 'Ontario',            gst: 0.00, hst: 0.13,  pst: 0.00,    hstLabel: 'HST'  },
+    'H': { name: 'Quebec',             gst: 0.05, hst: 0.00,  pst: 0.09975, hstLabel: 'QST'  },
+    'G': { name: 'Quebec',             gst: 0.05, hst: 0.00,  pst: 0.09975, hstLabel: 'QST'  },
+    'J': { name: 'Quebec',             gst: 0.05, hst: 0.00,  pst: 0.09975, hstLabel: 'QST'  },
+    'E': { name: 'New Brunswick',      gst: 0.00, hst: 0.15,  pst: 0.00,    hstLabel: 'HST'  },
+    'B': { name: 'Nova Scotia',        gst: 0.00, hst: 0.15,  pst: 0.00,    hstLabel: 'HST'  },
+    'C': { name: 'PEI',                gst: 0.00, hst: 0.15,  pst: 0.00,    hstLabel: 'HST'  },
+    'A': { name: 'Newfoundland',       gst: 0.00, hst: 0.15,  pst: 0.00,    hstLabel: 'HST'  },
+    'X': { name: 'NWT / Nunavut',      gst: 0.05, hst: 0.00,  pst: 0.00,    hstLabel: 'PST'  },
+    'Y': { name: 'Yukon',              gst: 0.05, hst: 0.00,  pst: 0.00,    hstLabel: 'PST'  }
   };
 
-  var hstRate = provinceTax[firstLetter] !== undefined ? provinceTax[firstLetter] : 0.00;
-  var gst     = subtotal * GST_RATE;
-  var hst     = subtotal * hstRate;
-  var total   = subtotal + gst + hst;
+  var prov    = provinceData[firstLetter] || provinceData['T'];
+  var gst     = subtotal * prov.gst;
+  var hst     = subtotal * prov.hst;
+  var pst     = subtotal * prov.pst;
+  var total   = subtotal + gst + hst + pst;
 
   // Format names for display
   var formatNames = { kindle: 'Kindle Edition', paperback: 'Paperback', hardcover: 'Hardcover' };
@@ -190,7 +190,7 @@ function addToCart() {
   cartCount.textContent = (parseInt(cartCount.textContent) || 0) + qty;
 
   // Fill dialog values
-  var img = document.getElementById('book-cover-img');
+  var img   = document.getElementById('book-cover-img');
   var thumb = document.getElementById('cart-thumb');
   if (thumb && img) thumb.src = img.src;
 
@@ -199,11 +199,34 @@ function addToCart() {
   document.getElementById('dialog-price').textContent      = p.label;
   document.getElementById('dialog-qty').textContent        = qty;
   document.getElementById('dialog-subtotal').textContent   = '$' + subtotal.toFixed(2);
-  document.getElementById('dialog-gst').textContent        = '$' + gst.toFixed(2) + ' (5%)';
-  document.getElementById('dialog-hst').textContent        = hstRate > 0
-    ? '$' + hst.toFixed(2) + ' (' + (hstRate * 100).toFixed(2) + '%)'
-    : '$0.00 (Alberta - no PST)';
-  document.getElementById('dialog-total').textContent      = '$' + total.toFixed(2);
+  document.getElementById('dialog-province').textContent   = prov.name;
+
+  // GST row
+  var gstEl = document.getElementById('dialog-gst');
+  if (prov.hst > 0) {
+    gstEl.textContent = 'Included in HST';
+    gstEl.style.color = '#888';
+  } else {
+    gstEl.textContent = '$' + gst.toFixed(2);
+    gstEl.style.color = '#0F1111';
+  }
+
+  // HST / PST row
+  var hstEl    = document.getElementById('dialog-hst');
+  var hstLbl   = document.getElementById('dialog-hst-label');
+  if (prov.hst > 0) {
+    if (hstLbl) hstLbl.textContent = 'HST (' + (prov.hst * 100).toFixed(0) + '%):';
+    hstEl.textContent = '$' + hst.toFixed(2);
+  } else if (prov.pst > 0) {
+    if (hstLbl) hstLbl.textContent = prov.hstLabel + ' (' + (prov.pst * 100).toFixed(3).replace(/\.?0+$/, '') + '%):';
+    hstEl.textContent = '$' + pst.toFixed(2);
+  } else {
+    if (hstLbl) hstLbl.textContent = 'PST:';
+    hstEl.textContent = '$0.00 (No PST)';
+    hstEl.style.color = '#888';
+  }
+
+  document.getElementById('dialog-total').textContent = '$' + total.toFixed(2);
 
   // Show dialog
   document.getElementById('cart-overlay').classList.add('active');
