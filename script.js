@@ -162,29 +162,33 @@ function showToast(message) {
   setTimeout(function() { toast.classList.remove('show'); }, 3000);
 }
 
-// ===== IMAGE HOVER ZOOM (magnifier lens) =====
+// ===== IMAGE HOVER ZOOM =====
 function setupZoom() {
-  var img       = document.getElementById('book-cover-img');
-  var lens      = document.getElementById('zoom-lens');
-  var result    = document.getElementById('zoom-result');
+  var img    = document.getElementById('book-cover-img');
+  var lens   = document.getElementById('zoom-lens');
+  var result = document.getElementById('zoom-result');
 
   if (!img || !lens || !result) return;
 
-  var zoomLevel = 3;
+  var ZOOM = 3;
 
-  function setBackground() {
-    var w = img.offsetWidth;
-    var h = img.offsetHeight;
-    result.style.backgroundImage = "url('" + img.src + "')";
-    result.style.backgroundSize  = (w * zoomLevel) + 'px ' + (h * zoomLevel) + 'px';
-    result.style.width  = '300px';
-    result.style.height = (h) + 'px';
+  // Wait until image is fully loaded before setting up
+  function init() {
+    var iw = img.offsetWidth;
+    var ih = img.offsetHeight;
+
+    // Style the result box
+    result.style.width            = '280px';
+    result.style.height           = ih + 'px';
+    result.style.backgroundImage  = "url('" + img.src + "')";
+    result.style.backgroundSize   = (iw * ZOOM) + 'px ' + (ih * ZOOM) + 'px';
+    result.style.backgroundRepeat = 'no-repeat';
   }
 
   img.addEventListener('mouseenter', function() {
+    init();
     lens.style.display   = 'block';
     result.style.display = 'block';
-    setBackground();
   });
 
   img.addEventListener('mouseleave', function() {
@@ -192,29 +196,32 @@ function setupZoom() {
     result.style.display = 'none';
   });
 
-  img.addEventListener('mousemove', moveLens);
+  img.addEventListener('mousemove', function(e) {
+    var rect = img.getBoundingClientRect();
+    var mouseX = e.clientX - rect.left;
+    var mouseY = e.clientY - rect.top;
 
-  function moveLens(e) {
-    var rect  = img.getBoundingClientRect();
-    var x     = e.clientX - rect.left;
-    var y     = e.clientY - rect.top;
-    var lensW = lens.offsetWidth  / 2;
-    var lensH = lens.offsetHeight / 2;
+    var iw = img.offsetWidth;
+    var ih = img.offsetHeight;
+    var lw = lens.offsetWidth;
+    var lh = lens.offsetHeight;
 
-    var lx = x - lensW;
-    var ly = y - lensH;
-
+    // Position lens centered on cursor, clamped to image bounds
+    var lx = mouseX - lw / 2;
+    var ly = mouseY - lh / 2;
     if (lx < 0) lx = 0;
     if (ly < 0) ly = 0;
-    if (lx > img.offsetWidth  - lens.offsetWidth)  lx = img.offsetWidth  - lens.offsetWidth;
-    if (ly > img.offsetHeight - lens.offsetHeight) ly = img.offsetHeight - lens.offsetHeight;
+    if (lx > iw - lw) lx = iw - lw;
+    if (ly > ih - lh) ly = ih - lh;
 
     lens.style.left = lx + 'px';
     lens.style.top  = ly + 'px';
 
-    result.style.backgroundPosition =
-      '-' + (lx * zoomLevel) + 'px -' + (ly * zoomLevel) + 'px';
-  }
+    // Shift background in result to match lens position
+    var bgX = -(lx * ZOOM);
+    var bgY = -(ly * ZOOM);
+    result.style.backgroundPosition = bgX + 'px ' + bgY + 'px';
+  });
 }
 
 // ===== DOM READY =====
