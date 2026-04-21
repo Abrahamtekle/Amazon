@@ -934,3 +934,15 @@ a:hover {
   color: #0F1111 !important;
 }
 .cart-continue-btn:hover { background: #f7fafa !important; }
+
+/* Province row in cart dialog */
+.cart-province-row {
+  background: #f0f7ff !important;
+  border-radius: 4px !important;
+  padding: 5px 6px !important;
+  margin: 2px 0 !important;
+}
+.cart-province-val {
+  color: #007185 !important;
+  font-size: 13px !important;
+}
