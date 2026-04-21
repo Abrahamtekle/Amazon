@@ -148,39 +148,13 @@ function addToCart() {
   var p     = prices[currentFormat];
   var subtotal = p.full * qty;
 
-  // Detect province from postal code
-  var postalInput  = document.getElementById('postal-input');
-  var postal       = postalInput ? postalInput.value.trim().toUpperCase() : 'T';
-  var firstLetter  = postal.charAt(0);
+  // Fixed tax rates
+  var GST_RATE = 0.05;  // 5% GST
+  var HST_RATE = 0.08;  // 8% HST
 
-  // Province info: { name, gst, hst, pst, hstLabel }
-  // HST provinces collect HST instead of GST+PST separately
-  var provinceData = {
-    'T': { name: 'Alberta',            gst: 0.05, hst: 0.00,  pst: 0.00,    hstLabel: 'PST'  },
-    'S': { name: 'Saskatchewan',       gst: 0.05, hst: 0.00,  pst: 0.06,    hstLabel: 'PST'  },
-    'R': { name: 'Manitoba',           gst: 0.05, hst: 0.00,  pst: 0.07,    hstLabel: 'PST'  },
-    'V': { name: 'British Columbia',   gst: 0.05, hst: 0.00,  pst: 0.07,    hstLabel: 'PST'  },
-    'M': { name: 'Ontario',            gst: 0.00, hst: 0.13,  pst: 0.00,    hstLabel: 'HST'  },
-    'L': { name: 'Ontario',            gst: 0.00, hst: 0.13,  pst: 0.00,    hstLabel: 'HST'  },
-    'K': { name: 'Ontario',            gst: 0.00, hst: 0.13,  pst: 0.00,    hstLabel: 'HST'  },
-    'N': { name: 'Ontario',            gst: 0.00, hst: 0.13,  pst: 0.00,    hstLabel: 'HST'  },
-    'P': { name: 'Ontario',            gst: 0.00, hst: 0.13,  pst: 0.00,    hstLabel: 'HST'  },
-    'H': { name: 'Quebec',             gst: 0.05, hst: 0.00,  pst: 0.09975, hstLabel: 'QST'  },
-    'G': { name: 'Quebec',             gst: 0.05, hst: 0.00,  pst: 0.09975, hstLabel: 'QST'  },
-    'J': { name: 'Quebec',             gst: 0.05, hst: 0.00,  pst: 0.09975, hstLabel: 'QST'  },
-    'E': { name: 'New Brunswick',      gst: 0.00, hst: 0.15,  pst: 0.00,    hstLabel: 'HST'  },
-    'B': { name: 'Nova Scotia',        gst: 0.00, hst: 0.15,  pst: 0.00,    hstLabel: 'HST'  },
-    'C': { name: 'PEI',                gst: 0.00, hst: 0.15,  pst: 0.00,    hstLabel: 'HST'  },
-    'A': { name: 'Newfoundland',       gst: 0.00, hst: 0.15,  pst: 0.00,    hstLabel: 'HST'  },
-    'X': { name: 'NWT / Nunavut',      gst: 0.05, hst: 0.00,  pst: 0.00,    hstLabel: 'PST'  },
-    'Y': { name: 'Yukon',              gst: 0.05, hst: 0.00,  pst: 0.00,    hstLabel: 'PST'  }
-  };
-
-  var prov    = provinceData[firstLetter] || provinceData['T'];
-  var gst     = subtotal * prov.gst;
-  var hst     = subtotal * prov.hst;
-  var pst     = subtotal * prov.pst;
-  var total   = subtotal + gst + hst + pst;
+  var gst   = subtotal * GST_RATE;
+  var hst   = subtotal * HST_RATE;
+  var total = subtotal + gst + hst;
 
   // Format names for display
   var formatNames = { kindle: 'Kindle Edition', paperback: 'Paperback', hardcover: 'Hardcover' };
@@ -199,34 +173,9 @@ function addToCart() {
   document.getElementById('dialog-price').textContent      = p.label;
   document.getElementById('dialog-qty').textContent        = qty;
   document.getElementById('dialog-subtotal').textContent   = '$' + subtotal.toFixed(2);
-  document.getElementById('dialog-province').textContent   = prov.name;
-
-  // GST row
-  var gstEl = document.getElementById('dialog-gst');
-  if (prov.hst > 0) {
-    gstEl.textContent = 'Included in HST';
-    gstEl.style.color = '#888';
-  } else {
-    gstEl.textContent = '$' + gst.toFixed(2);
-    gstEl.style.color = '#0F1111';
-  }
-
-  // HST / PST row
-  var hstEl    = document.getElementById('dialog-hst');
-  var hstLbl   = document.getElementById('dialog-hst-label');
-  if (prov.hst > 0) {
-    if (hstLbl) hstLbl.textContent = 'HST (' + (prov.hst * 100).toFixed(0) + '%):';
-    hstEl.textContent = '$' + hst.toFixed(2);
-  } else if (prov.pst > 0) {
-    if (hstLbl) hstLbl.textContent = prov.hstLabel + ' (' + (prov.pst * 100).toFixed(3).replace(/\.?0+$/, '') + '%):';
-    hstEl.textContent = '$' + pst.toFixed(2);
-  } else {
-    if (hstLbl) hstLbl.textContent = 'PST:';
-    hstEl.textContent = '$0.00 (No PST)';
-    hstEl.style.color = '#888';
-  }
-
-  document.getElementById('dialog-total').textContent = '$' + total.toFixed(2);
+  document.getElementById('dialog-gst').textContent        = '$' + gst.toFixed(2);
+  document.getElementById('dialog-hst').textContent        = '$' + hst.toFixed(2);
+  document.getElementById('dialog-total').textContent      = '$' + total.toFixed(2);
 
   // Show dialog
   document.getElementById('cart-overlay').classList.add('active');
