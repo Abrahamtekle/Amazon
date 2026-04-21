@@ -243,22 +243,19 @@
     <div class="ships-row"><span class="ships-label">Ships from</span> <a href="#">Amazon</a></div>
     <div class="ships-row"><span class="ships-label">Sold by</span> <a href="#">Amazon</a></div>
 
-    <!-- POSTAL CODE DELIVERY CALCULATOR -->
+    <!-- POSTAL CODE DELIVERY ESTIMATOR -->
     <div class="postal-box">
-      <div class="postal-title">&#128205; Estimate delivery to your location</div>
+      <div class="postal-title">&#128205; How many days to deliver to you?</div>
       <div class="postal-row">
-        <input type="text" id="postal-input" class="postal-input" placeholder="Enter postal code e.g. T2R1C" maxlength="7">
+        <input type="text" id="postal-input" class="postal-input"
+               placeholder="Enter postal code e.g. T2R1C" maxlength="7" value="T2R1C">
         <button id="postal-btn" class="postal-btn">Check</button>
       </div>
       <div id="kindle-section" style="display:none;" class="kindle-delivery">
-        &#9889; Kindle: Available <strong>instantly</strong> after purchase
+        &#9889; Kindle: Available <strong>instantly</strong> after purchase — no shipping needed!
       </div>
-      <div id="shipping-section" class="shipping-result">
-        <div class="delivery-line">
-          <span class="delivery-icon">&#128666;</span>
-          <span>Estimated delivery: <strong id="delivery-date">Friday, April 24</strong></span>
-        </div>
-        <div class="delivery-days-note" id="delivery-days">(2 business days)</div>
+      <div id="shipping-section">
+        <div id="delivery-result"></div>
       </div>
     </div>
   </div>
