@@ -807,13 +807,14 @@ a:hover {
   position: absolute;
   top: 0;
   left: 220px;
-  width: 280px;
-  border: 2px solid #febd69;
-  border-radius: 6px;
+  width: 450px;
+  height: 500px;
+  border: 3px solid #febd69;
+  border-radius: 8px;
   display: none;
   background-color: #fff;
   background-repeat: no-repeat;
-  box-shadow: 4px 4px 16px rgba(0,0,0,0.3);
+  box-shadow: 8px 8px 24px rgba(0,0,0,0.4);
   z-index: 9999;
   overflow: hidden;
 }
