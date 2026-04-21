@@ -144,6 +144,7 @@ function updateDelivery() {
 
 // ===== ADD TO CART =====
 function addToCart() {
+  try {
   var qty   = parseInt(document.getElementById('qty-select').value) || 1;
   var p     = prices[currentFormat];
   var subtotal = p.full * qty;
@@ -166,7 +167,16 @@ function addToCart() {
   // Fill dialog values
   var img   = document.getElementById('book-cover-img');
   var thumb = document.getElementById('cart-thumb');
-  if (thumb && img) thumb.src = img.src;
+  if (thumb && img) {
+    // Use the same src but only if it's a normal URL, not huge base64
+    if (img.src.startsWith('data:')) {
+      thumb.style.background = 'linear-gradient(160deg,#c8360c,#8b1a00)';
+      thumb.style.border = 'none';
+      thumb.src = '';
+    } else {
+      thumb.src = img.src;
+    }
+  }
 
   document.getElementById('cart-format-label').textContent = formatNames[currentFormat];
   document.getElementById('cart-qty-label').textContent    = 'Qty: ' + qty;
@@ -180,6 +190,11 @@ function addToCart() {
   // Show dialog
   document.getElementById('cart-overlay').classList.add('active');
   document.getElementById('cart-dialog').classList.add('active');
+
+  } catch(e) {
+    console.error('Cart error:', e);
+    alert('Cart error: ' + e.message);
+  }
 }
 
 // ===== CLOSE CART DIALOG =====
