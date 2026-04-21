@@ -1,81 +1,17 @@
 // ===== PRICES =====
 var prices = {
-  kindle:    { dollars: '8',  cents: '99',  label: '$8.99'  },
-  paperback: { dollars: '16', cents: '95',  label: '$16.95' },
-  hardcover: { dollars: '34', cents: '43',  label: '$34.43' }
+  kindle:    { dollars: '8',  cents: '99',  full: 8.99,  label: '$8.99'  },
+  paperback: { dollars: '16', cents: '95',  full: 16.95, label: '$16.95' },
+  hardcover: { dollars: '34', cents: '43',  full: 34.43, label: '$34.43' }
 };
 
-// ===== DELIVERY DAYS BY POSTAL CODE =====
-function getDeliveryDays(postalCode) {
-  if (!postalCode) return null;
-  var code = postalCode.trim().toUpperCase().replace(/\s/g, '');
-  var first = code.charAt(0);
-
-  // Canada postal code first letter = province
-  var deliveryMap = {
-    'T': 2,  // Alberta
-    'V': 3,  // British Columbia
-    'S': 3,  // Saskatchewan
-    'R': 4,  // Manitoba
-    'M': 1,  // Toronto
-    'L': 2,  // Ontario
-    'K': 2,  // Ontario East
-    'N': 2,  // Ontario SW
-    'P': 4,  // Northern Ontario
-    'H': 2,  // Montreal
-    'G': 3,  // Quebec City
-    'J': 3,  // Quebec
-    'E': 5,  // New Brunswick
-    'B': 5,  // Nova Scotia
-    'C': 6,  // PEI
-    'A': 6,  // Newfoundland
-    'X': 8,  // Territories
-    'Y': 8   // Yukon
-  };
-
-  var days = deliveryMap[first];
-  if (!days) return null;
-  return days;
-}
-
-function getDeliveryDate(days) {
-  var date = new Date();
-  var added = 0;
-  while (added < days) {
-    date.setDate(date.getDate() + 1);
-    var day = date.getDay();
-    if (day !== 0 && day !== 6) added++; // skip weekends
-  }
-  var options = { weekday: 'long', month: 'long', day: 'numeric' };
-  return date.toLocaleDateString('en-CA', options);
-}
-
-// ===== UPDATE DELIVERY INFO =====
-function updateDelivery() {
-  var postalInput = document.getElementById('postal-input');
-  var postalCode = postalInput ? postalInput.value : 'T2R1C';
-  var days = getDeliveryDays(postalCode);
-  var deliveryEl = document.getElementById('delivery-date');
-  var daysEl = document.getElementById('delivery-days');
-
-  if (!days) {
-    if (deliveryEl) deliveryEl.textContent = 'Enter a valid Canadian postal code';
-    if (daysEl) daysEl.textContent = '';
-    return;
-  }
-
-  var dateStr = getDeliveryDate(days);
-  if (deliveryEl) deliveryEl.textContent = dateStr;
-  if (daysEl) daysEl.textContent = '(' + days + ' business day' + (days > 1 ? 's' : '') + ')';
-}
-
-// ===== FORMAT SELECTOR =====
 var currentFormat = 'paperback';
 
+// ===== FORMAT SELECTOR =====
 function selectFormat(format) {
   currentFormat = format;
 
-  // Remove selected from all
+  // Remove selected from all options
   document.querySelectorAll('.format-option').forEach(function(el) {
     el.classList.remove('selected');
   });
@@ -86,7 +22,7 @@ function selectFormat(format) {
     el.classList.remove('selected-price');
   });
 
-  // Apply selected
+  // Highlight selected option
   var chosen = document.getElementById('fmt-' + format);
   if (chosen) {
     chosen.classList.add('selected');
@@ -94,58 +30,131 @@ function selectFormat(format) {
     chosen.querySelector('.format-price').classList.add('selected-price');
   }
 
-  // Update main price
+  // Update big price display
   var p = prices[format];
   document.querySelector('.main-price').innerHTML =
     '<sup>$</sup>' + p.dollars + '<sup class="cents">' + p.cents + '</sup>';
 
-  // Update total
+  // Update total cost
   updateTotal();
 
-  // Update delivery (Kindle = instant, others = shipping)
-  var deliverySection = document.getElementById('shipping-section');
-  var kindleSection = document.getElementById('kindle-section');
+  // Show/hide delivery sections
+  var shippingSection = document.getElementById('shipping-section');
+  var kindleSection   = document.getElementById('kindle-section');
 
   if (format === 'kindle') {
-    if (deliverySection) deliverySection.style.display = 'none';
-    if (kindleSection) kindleSection.style.display = 'block';
+    if (shippingSection) shippingSection.style.display = 'none';
+    if (kindleSection)   kindleSection.style.display   = 'block';
   } else {
-    if (deliverySection) deliverySection.style.display = 'block';
-    if (kindleSection) kindleSection.style.display = 'none';
+    if (shippingSection) shippingSection.style.display = 'block';
+    if (kindleSection)   kindleSection.style.display   = 'none';
     updateDelivery();
   }
 }
 
-// ===== TOTAL COST =====
+// ===== TOTAL COST (qty x price) =====
 function updateTotal() {
-  var qty = parseInt(document.getElementById('qty-select').value) || 1;
-  var p = prices[currentFormat];
-  var unitPrice = parseFloat(p.dollars + '.' + p.cents);
-  var total = (unitPrice * qty).toFixed(2);
-  var totalEl = document.getElementById('total-cost');
-  if (totalEl) {
-    totalEl.textContent = '$' + total;
+  var qty       = parseInt(document.getElementById('qty-select').value) || 1;
+  var p         = prices[currentFormat];
+  var total     = (p.full * qty).toFixed(2);
+
+  var totalEl   = document.getElementById('total-cost');
+  var noteEl    = document.getElementById('unit-price-note');
+
+  if (totalEl) totalEl.textContent = '$' + total;
+  if (noteEl)  noteEl.textContent  = qty > 1 ? qty + ' x ' + p.label + ' each' : '';
+}
+
+// ===== POSTAL CODE → DELIVERY DAYS =====
+function getDeliveryDays(postalCode) {
+  var code  = postalCode.trim().toUpperCase().replace(/\s/g, '');
+  var first = code.charAt(0);
+
+  // Canada: first letter of postal code = province/region
+  var map = {
+    'T': 2,   // Alberta (Calgary, Edmonton)
+    'V': 3,   // British Columbia (Vancouver)
+    'S': 3,   // Saskatchewan
+    'R': 4,   // Manitoba (Winnipeg)
+    'M': 1,   // Ontario - Toronto
+    'L': 2,   // Ontario - GTA
+    'K': 2,   // Ontario East (Ottawa)
+    'N': 2,   // Ontario Southwest
+    'P': 4,   // Northern Ontario
+    'H': 2,   // Quebec - Montreal
+    'G': 3,   // Quebec City
+    'J': 3,   // Quebec (other)
+    'E': 5,   // New Brunswick
+    'B': 5,   // Nova Scotia
+    'C': 6,   // Prince Edward Island
+    'A': 7,   // Newfoundland
+    'X': 9,   // Northwest Territories / Nunavut
+    'Y': 9    // Yukon
+  };
+
+  return map[first] || null;
+}
+
+function getDeliveryDate(days) {
+  var date  = new Date();
+  var added = 0;
+  while (added < days) {
+    date.setDate(date.getDate() + 1);
+    var d = date.getDay();
+    if (d !== 0 && d !== 6) added++; // skip weekends
   }
-  var unitEl = document.getElementById('unit-price-note');
-  if (unitEl && qty > 1) {
-    unitEl.textContent = qty + ' x ' + p.label + ' each';
-  } else if (unitEl) {
-    unitEl.textContent = '';
+  return date.toLocaleDateString('en-CA', {
+    weekday: 'long', month: 'long', day: 'numeric'
+  });
+}
+
+// ===== UPDATE DELIVERY SECTION =====
+function updateDelivery() {
+  var postalInput = document.getElementById('postal-input');
+  var postalCode  = postalInput ? postalInput.value : 'T2R1C';
+  var resultEl    = document.getElementById('delivery-result');
+
+  if (!postalCode.trim()) {
+    if (resultEl) resultEl.innerHTML =
+      '<span style="color:#c00;">Please enter a postal code.</span>';
+    return;
   }
+
+  var days = getDeliveryDays(postalCode);
+
+  if (!days) {
+    if (resultEl) resultEl.innerHTML =
+      '<span style="color:#c00;">&#10007; Invalid postal code. Try e.g. T2R1C or M5V2T6</span>';
+    return;
+  }
+
+  var dateStr = getDeliveryDate(days);
+  var plural  = days > 1 ? 'days' : 'day';
+
+  if (resultEl) resultEl.innerHTML =
+    '<div class="delivery-line">' +
+      '<span class="delivery-icon">&#128666;</span>' +
+      '<span>Arrives by <strong>' + dateStr + '</strong></span>' +
+    '</div>' +
+    '<div class="delivery-days-note">' +
+      '&#128197; ' + days + ' business ' + plural + ' from now' +
+    '</div>' +
+    '<div class="delivery-free">&#10003; FREE delivery with Amazon Prime</div>';
 }
 
 // ===== ADD TO CART =====
 function addToCart() {
-  var qty = parseInt(document.getElementById('qty-select').value) || 1;
+  var qty   = parseInt(document.getElementById('qty-select').value) || 1;
+  var p     = prices[currentFormat];
+  var total = (p.full * qty).toFixed(2);
+
   var cartCount = document.querySelector('.cart-count');
   cartCount.textContent = (parseInt(cartCount.textContent) || 0) + qty;
-  var p = prices[currentFormat];
-  var unitPrice = parseFloat(p.dollars + '.' + p.cents);
-  var total = (unitPrice * qty).toFixed(2);
-  showToast('&#10003; Added ' + qty + ' x ' + p.label + ' = $' + total);
+
+  showToast('&#10003; Added ' + qty + ' x ' + p.label + ' = $' + total + ' to Cart!');
 }
 
-// ===== TOAST =====
+// ===== TOAST NOTIFICATION =====
 function showToast(message) {
   var toast = document.getElementById('toast');
   toast.innerHTML = message;
@@ -157,21 +166,27 @@ function showToast(message) {
 function setupZoom() {
   var coverImg = document.querySelector('.book-cover-img');
   if (!coverImg) return;
+
   var overlay = document.createElement('div');
   overlay.className = 'zoom-overlay';
   var zoomImg = document.createElement('img');
   zoomImg.src = coverImg.src;
-  zoomImg.alt = 'Book cover zoom';
+  zoomImg.alt = 'Zoomed cover';
   overlay.appendChild(zoomImg);
   document.body.appendChild(overlay);
-  coverImg.addEventListener('click', function() { overlay.classList.add('active'); });
-  overlay.addEventListener('click', function() { overlay.classList.remove('active'); });
+
+  coverImg.addEventListener('click', function() {
+    overlay.classList.add('active');
+  });
+  overlay.addEventListener('click', function() {
+    overlay.classList.remove('active');
+  });
 }
 
 // ===== DOM READY =====
 document.addEventListener('DOMContentLoaded', function() {
 
-  // Follow buttons
+  // Follow buttons toggle
   document.querySelectorAll('.follow-btn').forEach(function(btn) {
     btn.addEventListener('click', function() {
       if (this.classList.contains('following')) {
@@ -179,38 +194,53 @@ document.addEventListener('DOMContentLoaded', function() {
         this.textContent = 'Follow';
       } else {
         this.classList.add('following');
-        this.textContent = 'Following';
+        this.textContent = 'Following ✓';
       }
     });
   });
 
-  // Search
-  document.querySelector('.search-btn').addEventListener('click', function() {
-    var q = document.querySelector('.search-input').value.trim();
-    if (q) showToast('&#128269; Searching: ' + q);
-  });
+  // Search button
+  var searchBtn = document.querySelector('.search-btn');
+  if (searchBtn) {
+    searchBtn.addEventListener('click', function() {
+      var q = document.querySelector('.search-input').value.trim();
+      if (q) showToast('&#128269; Searching for: ' + q);
+    });
+  }
 
   // Buy Now
-  document.querySelector('.buy-now-btn').addEventListener('click', function() {
-    showToast('&#128722; Proceeding to checkout...');
-  });
+  var buyNow = document.querySelector('.buy-now-btn');
+  if (buyNow) {
+    buyNow.addEventListener('click', function() {
+      showToast('&#128722; Proceeding to checkout...');
+    });
+  }
 
   // Join Prime
-  document.querySelector('.join-prime-btn').addEventListener('click', function() {
-    showToast('&#10024; Redirecting to Prime signup...');
-  });
+  var joinPrime = document.querySelector('.join-prime-btn');
+  if (joinPrime) {
+    joinPrime.addEventListener('click', function() {
+      showToast('&#10024; Redirecting to Prime signup...');
+    });
+  }
 
   // Read Sample
-  document.querySelector('.read-sample-btn').addEventListener('click', function() {
-    showToast('&#128218; Loading sample...');
-  });
+  var readSample = document.querySelector('.read-sample-btn');
+  if (readSample) {
+    readSample.addEventListener('click', function() {
+      showToast('&#128218; Loading sample pages...');
+    });
+  }
 
-  // Qty change → update total
-  document.getElementById('qty-select').addEventListener('change', function() {
-    updateTotal();
-  });
+  // Quantity change → recalculate total
+  var qtySelect = document.getElementById('qty-select');
+  if (qtySelect) {
+    qtySelect.addEventListener('change', function() {
+      updateTotal();
+    });
+  }
 
-  // Postal code check button
+  // Postal check button
   var postalBtn = document.getElementById('postal-btn');
   if (postalBtn) {
     postalBtn.addEventListener('click', function() {
@@ -218,7 +248,7 @@ document.addEventListener('DOMContentLoaded', function() {
     });
   }
 
-  // Postal code enter key
+  // Postal input — press Enter to check
   var postalInput = document.getElementById('postal-input');
   if (postalInput) {
     postalInput.addEventListener('keydown', function(e) {
@@ -226,7 +256,7 @@ document.addEventListener('DOMContentLoaded', function() {
     });
   }
 
-  // Init
+  // Init on load
   setupZoom();
   updateTotal();
   updateDelivery();
